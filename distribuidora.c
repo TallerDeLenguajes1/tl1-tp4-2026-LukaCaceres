@@ -45,9 +45,40 @@ void crearTarea(Nodo **start, Nodo **end, int indice){
     }
 }
 
+void transferir(Nodo **start, Nodo **startC, Nodo **endC, int id){
+    Nodo *aux = *start;
+    Nodo *anterior = NULL;
+    while(aux!=NULL){ //mientras no sea el end
+        if(aux->T.id==id){
+
+             //Eliminar tarea de la lista de pendientes
+            if(anterior==NULL){
+                *start=aux->siguiente;
+            }else{
+                anterior->siguiente=aux->siguiente;
+            }
+            aux->siguiente=NULL;
+
+            //Agregar a la lista de completadas
+            Nodo * Tcompletada=aux;
+            Tcompletada->siguiente=NULL;
+            if(*startC==NULL){
+                *startC=Tcompletada;
+                *endC=Tcompletada;
+            }else{
+                (*endC)->siguiente=Tcompletada;
+                *endC=Tcompletada;
+            }
+
+        }
+        anterior = aux;
+        aux = aux->siguiente; //paso al siguiente
+    }
+}
+
 int main(){
-    Nodo * start = NULL, *end=NULL;
-    int bandera=1, indice=0;
+    Nodo * start = NULL, *end=NULL, * startC = NULL, *endC=NULL;
+    int bandera=1, indice=0, idBuscar;
     while(bandera==1){
         crearTarea(&start, &end, indice);
         indice++;
@@ -55,5 +86,8 @@ int main(){
         scanf("%d", &bandera);
         fflush(stdin);
     }
+    printf("\nIngrese el ID de la tarea completada: ");
+    scanf("%d", &idBuscar);
+
     return 0;
 }
