@@ -76,18 +76,59 @@ void transferir(Nodo **start, Nodo **startC, Nodo **endC, int id){
     }
 }
 
+void listar(Nodo **start, Nodo **startC){
+    Nodo *aux = *start;
+    Nodo *auxC= *startC;
+    //Listado de pendientes
+    while(aux!=NULL){
+        printf("\nID: %d", aux->T.id);
+        printf("\nDescrpcion: ");
+        puts(aux->T.descripcion);
+        printf("Duracion: %d", aux->T.duracion);
+        aux=aux->siguiente;
+    }
+    while(auxC!=NULL){
+        printf("\nID: %d", auxC->T.id);
+        printf("\nDescrpcion: ");
+        puts(auxC->T.descripcion);
+        printf("Duracion: %d", auxC->T.duracion);
+        auxC=auxC->siguiente;
+    }
+
+
+}
+
 int main(){
     Nodo * start = NULL, *end=NULL, * startC = NULL, *endC=NULL;
-    int bandera=1, indice=0, idBuscar;
+    int bandera=1, banderaC=1, indice=0, idBuscar;
+
+    //Crear Tarea Pendiente
     while(bandera==1){
         crearTarea(&start, &end, indice);
         indice++;
-        printf("Si desea terminar la carga, ingrese cualquier numero distinto de 1: ");
+        printf("Ingrese 1 para seguir la carga y 0 para salir: ");
         scanf("%d", &bandera);
         fflush(stdin);
     }
-    printf("\nIngrese el ID de la tarea completada: ");
-    scanf("%d", &idBuscar);
+
+    //Pasar de pendiente a completada
+    while(banderaC==1){
+        printf("\nIngrese el ID de la tarea completada: ");
+        scanf("%d", &idBuscar);
+        while(idBuscar<1000){
+            printf("\nEl ID debe ser mayor o igual a 1000: ");
+            scanf("%d", &idBuscar);
+        }
+        transferir(&start, &startC, &endC, idBuscar);
+        printf("Ingrese 1 para seguir la carga y 0 para salir: ");
+        scanf("%d", &banderaC);
+        fflush(stdin);
+    }
+
+    //Listar tareas
+    listar(&start, &startC);
+
+    
 
     return 0;
 }
