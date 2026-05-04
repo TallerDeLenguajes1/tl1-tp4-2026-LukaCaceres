@@ -48,7 +48,8 @@ void crearTarea(Nodo **start, Nodo **end, int indice){
 void transferir(Nodo **start, Nodo **startC, Nodo **endC, int id){
     Nodo *aux = *start;
     Nodo *anterior = NULL;
-    while(aux!=NULL){ //mientras no sea el end
+    int encontrado =0;
+    while(aux!=NULL  && encontrado==0){ //mientras no sea el end
         if(aux->T.id==id){
 
              //Eliminar tarea de la lista de pendientes
@@ -69,10 +70,14 @@ void transferir(Nodo **start, Nodo **startC, Nodo **endC, int id){
                 (*endC)->siguiente=Tcompletada;
                 *endC=Tcompletada;
             }
-
+            encontrado=1;
         }
-        anterior = aux;
-        aux = aux->siguiente; //paso al siguiente
+         //paso al siguiente
+        if(encontrado==0){
+            anterior = aux;
+            aux = aux->siguiente;
+        }
+        
     }
 }
 
@@ -80,6 +85,7 @@ void listar(Nodo **start, Nodo **startC){
     Nodo *aux = *start;
     Nodo *auxC= *startC;
     //Listado de pendientes
+    printf("\n----------Tareas Pendientes----------");
     while(aux!=NULL){
         printf("\nID: %d", aux->T.id);
         printf("\nDescrpcion: ");
@@ -87,6 +93,9 @@ void listar(Nodo **start, Nodo **startC){
         printf("Duracion: %d", aux->T.duracion);
         aux=aux->siguiente;
     }
+     printf("\n-----------------------");
+    //Listado de completadas
+    printf("\n----------Tareas Completadas----------");
     while(auxC!=NULL){
         printf("\nID: %d", auxC->T.id);
         printf("\nDescrpcion: ");
@@ -94,41 +103,158 @@ void listar(Nodo **start, Nodo **startC){
         printf("Duracion: %d", auxC->T.duracion);
         auxC=auxC->siguiente;
     }
+    printf("\n-----------------------");
 
 
 }
 
+void consultarById(Nodo **start, Nodo **startC, int id){
+    Nodo *aux = *start;
+    Nodo *auxC= *startC;
+    int encontrado=0;
+    while(aux!=NULL){
+        if(aux->T.id==id){
+            printf("\n-----------------Tarea Pendiente-----------------");
+            printf("\nID: %d", aux->T.id);
+            printf("\nDescrpcion: ");
+            puts(aux->T.descripcion);
+            printf("Duracion: %d", aux->T.duracion);
+            aux=NULL;
+            encontrado = 1;
+        }else{
+            aux=aux->siguiente;
+        }
+    }
+    while(encontrado==0 && auxC!=NULL){
+        if(auxC->T.id==id){
+            printf("\n-----------------Tarea Completada-----------------");
+            printf("\nID: %d", auxC->T.id);
+            printf("\nDescrpcion: ");
+            puts(auxC->T.descripcion);
+            printf("Duracion: %d", auxC->T.duracion);
+            encontrado=1;
+            auxC=NULL;
+        }else{
+            auxC=auxC->siguiente;
+        }
+    }
+
+    if(encontrado==0){
+        printf("\nTarea no encontrada");
+    }
+}
+
+void consultarByKeyword(Nodo **start, Nodo **startC, char *keyword){
+    Nodo *aux = *start;
+    Nodo *auxC= *startC;
+    int encontrado=0;
+    while(aux!=NULL){
+        if(strstr(aux->T.descripcion, keyword)){
+            printf("\n-----------------Tarea Pendiente-----------------");
+            printf("\nID: %d", aux->T.id);
+            printf("\nDescrpcion: ");
+            puts(aux->T.descripcion);
+            printf("Duracion: %d", aux->T.duracion);
+            aux=NULL;
+            encontrado = 1;
+        }else{
+            aux=aux->siguiente;
+        }
+    }
+    while(encontrado==0 && auxC!=NULL){
+        if(strstr(auxC->T.descripcion, keyword)){
+            printf("\n-----------------Tarea Completada-----------------");
+            printf("\nID: %d", auxC->T.id);
+            printf("\nDescrpcion: ");
+            puts(auxC->T.descripcion);
+            printf("Duracion: %d", auxC->T.duracion);
+            encontrado=1;
+            aux=NULL;
+        }else{
+            auxC=auxC->siguiente;
+        }
+    }
+
+    if(encontrado==0){
+        printf("\nTarea no encontrada");
+    }
+}
+
 int main(){
     Nodo * start = NULL, *end=NULL, * startC = NULL, *endC=NULL;
-    int bandera=1, banderaC=1, indice=0, idBuscar;
+    char buff[50];
+    char *keyword;
+    int indice=0, idBuscar;
+    int menu=1;
 
-    //Crear Tarea Pendiente
-    while(bandera==1){
-        crearTarea(&start, &end, indice);
-        indice++;
-        printf("Ingrese 1 para seguir la carga y 0 para salir: ");
-        scanf("%d", &bandera);
+    do{
+        printf("\n-----------------------MENU-----------------------");
+
+        printf("\n 1) Agregar Tarea Pendiente");
+        printf("\n 2) Pasar de Pendiente a Completada");
+        printf("\n 3) Listar todas las tareas");
+        printf("\n 4) Consultar tarea por ID");
+        printf("\n 5) Consultar tarea por palabra clave");
+        printf("\n 0) Salir");
+        printf("\n--------------------------------------------------");
+        scanf("%d", &menu);
         fflush(stdin);
-    }
-
-    //Pasar de pendiente a completada
-    while(banderaC==1){
-        printf("\nIngrese el ID de la tarea completada: ");
-        scanf("%d", &idBuscar);
-        while(idBuscar<1000){
-            printf("\nEl ID debe ser mayor o igual a 1000: ");
-            scanf("%d", &idBuscar);
+        switch(menu){
+            case 1:
+                crearTarea(&start, &end, indice);
+                indice++;
+                break;
+            case 2:
+                printf("\nIngrese el ID de la tarea completada: ");
+                scanf("%d", &idBuscar);
+                while(idBuscar<1000){
+                    printf("\nEl ID debe ser mayor o igual a 1000: ");
+                    scanf("%d", &idBuscar);
+                }
+                transferir(&start, &startC, &endC, idBuscar);
+                break;
+            case 3:
+                listar(&start, &startC);
+                break;
+            case 4:
+                printf("\nIngrese el ID de la tarea a Buscar: ");
+                scanf("%d", &idBuscar);
+                while(idBuscar<1000){
+                    printf("\nEl ID debe ser mayor o igual a 1000: ");
+                    scanf("%d", &idBuscar);
+                }
+                consultarById(&start, &startC, idBuscar);
+                break;
+            case 5:
+                printf("\nIngrese la palabra clave a buscar: ");
+                fgets(buff, sizeof(buff), stdin);
+                buff[strcspn(buff, "\n")] = '\0';
+                int len = strlen(buff)+1;
+                keyword = malloc(sizeof(char)*len);
+                strcpy(keyword, buff);
+                consultarByKeyword(&start, &startC, keyword);
         }
-        transferir(&start, &startC, &endC, idBuscar);
-        printf("Ingrese 1 para seguir la carga y 0 para salir: ");
-        scanf("%d", &banderaC);
-        fflush(stdin);
+    }while(menu!=0);
+
+
+    //Liberar memoria
+    Nodo *aux = start;
+    Nodo *auxC= startC;
+    Nodo *actual;
+    int encontrado=0;
+    while(aux!=NULL){
+        free(aux->T.descripcion);
+        actual=aux;
+        aux=aux->siguiente;
+        free(actual);
     }
-
-    //Listar tareas
-    listar(&start, &startC);
-
+    while(auxC!=NULL){
+        free(auxC->T.descripcion);
+        actual=auxC;
+        auxC=auxC->siguiente;
+        free(actual);
+    }
+    free(keyword);
     
-
     return 0;
 }
